@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekomendasi Laptop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6C63FF;
+            --secondary-color: #4A47A3;
+            --accent-color: #FF6B6B;
+            --text-color: #E0E0E0;
+            --background-color: #121212;
+            --container-bg: #1E1E1E;
+            --input-bg: #2C2C2C;
+            --input-border: #3D3D3D;
+        }
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 500px;
+            padding: 40px;
+            background: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 8px;
+            font-weight: 400;
+            color: var(--text-color);
+        }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 25px;
+            border: 1px solid var(--input-border);
+            border-radius: 6px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        input[type="text"]:focus, input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2);
+        }
+        input[type="submit"] {
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: #FFFFFF;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background-color: var(--secondary-color);
+        }
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-group span {
+            position: absolute;
+            left: 12px;
+            color: var(--text-color);
+            font-size: 16px;
+        }
+        .input-group input[type="text"] {
+            padding-left: 35px;
+        }
+        #laptopRecommendations {
+            margin-top: 30px;
+            background-color: var(--input-bg);
+            padding: 20px;
+            border-radius: 6px;
+            display: none;
+        }
+        .laptop-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--container-bg);
+            border-radius: 6px;
+            transition: transform 0.3s ease;
+        }
+        .laptop-item:hover {
+            transform: translateY(-5px);
+        }
+        .laptop-item h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.2em;
+        }
+        .laptop-item p {
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Rekomendasi Laptop</h1>
+        <form id="laptopForm">
+            <label for="budget">Budget:</label>
+            <div class="input-group">
+                <span style="bottom: 50%;">Rp</span>
+                <input type="text" id="budget" name="budget" required placeholder="Budget..." class="form-input">
+            </div>
+            <label for="kebutuhan">Kebutuhan:</label>
+            <div class="select-wrapper">
+                <select id="kebutuhan" name="kebutuhan" required>
+                    <option value="" disabled selected>Pilih kebutuhan</option>
+                    <option value="gaming">Gaming</option>
+                    <option value="office">Pekerjaan Kantor</option>
+                    <option value="design">Desain Grafis</option>
+                    <option value="programming">Pemrograman</option>
+                    <option value="multimedia">Multimedia</option>
+                </select>
+                <span class="select-arrow"></span>
+            </div>
+            
+            <input type="submit" value="Dapatkan Rekomendasi">
+        </form>
+        <div id="laptopRecommendations"></div>
+    </div>
+
+    <script>
+        function formatRupiah(angka) {
+            var number_string = angka.replace(/[^,\d]/g, '').toString(),
+                split = number_string.split(','),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+            return rupiah;
+        }
+
+        document.getElementById('budget').addEventListener('input', function(e) {
+            this.value = formatRupiah(this.value);
+        });
+
+        const laptopDatabase = [
+            // Budget Laptops (2-5 juta)
+            { brand: 'Asus', model: 'VivoBook E12', processor: 'Intel Celeron N4000', ram: '4GB', storage: '64GB eMMC', price: 2500000, category: 'office' },
+            { brand: 'Lenovo', model: 'IdeaPad 1', processor: 'AMD A4-9120e', ram: '4GB', storage: '64GB eMMC', price: 3000000, category: 'office' },
+            { brand: 'HP', model: 'Stream 11', processor: 'Intel Celeron N4000', ram: '4GB', storage: '32GB eMMC', price: 3500000, category: 'office' },
+            { brand: 'Acer', model: 'Aspire 1', processor: 'Intel Celeron N4020', ram: '4GB', storage: '64GB eMMC', price: 4000000, category: 'office' },
+            { brand: 'Dell', model: 'Inspiron 11 3000', processor: 'AMD A9-9420e', ram: '4GB', storage: '128GB SSD', price: 4500000, category: 'office' },
+            { brand: 'Chuwi', model: 'HeroBook Pro', processor: 'Intel Celeron N4020', ram: '8GB', storage: '256GB SSD', price: 3800000, category: 'office' },
+            { brand: 'Avita', model: 'Pura', processor: 'AMD A9-9420E', ram: '4GB', storage: '128GB SSD', price: 3700000, category: 'office' },
+
+            // Entry-level Laptops (5-10 juta)
+            { brand: 'Asus', model: 'VivoBook 14', processor: 'AMD Ryzen 3 3250U', ram: '4GB', storage: '256GB SSD', price: 6000000, category: 'office' },
+            { brand: 'Lenovo', model: 'IdeaPad 3', processor: 'Intel Core i3-1005G1', ram: '8GB', storage: '256GB SSD', price: 7000000, category: 'office' },
+            { brand: 'HP', model: 'Pavilion 14', processor: 'AMD Ryzen 5 3500U', ram: '8GB', storage: '512GB SSD', price: 8000000, category: 'office' },
+            { brand: 'Acer', model: 'Swift 3', processor: 'AMD Ryzen 5 4500U', ram: '8GB', storage: '512GB SSD', price: 9000000, category: 'office' },
+            { brand: 'Dell', model: 'Inspiron 15 3000', processor: 'Intel Core i5-1035G1', ram: '8GB', storage: '256GB SSD', price: 9500000, category: 'office' },
+            { brand: 'Huawei', model: 'MateBook D 15', processor: 'AMD Ryzen 5 3500U', ram: '8GB', storage: '256GB SSD', price: 8500000, category: 'office' },
+            { brand: 'Xiaomi', model: 'RedmiBook 15', processor: 'Intel Core i3-1115G4', ram: '8GB', storage: '256GB SSD', price: 7500000, category: 'office' },
+
+            // Gaming Laptops
+            // Entry-level Gaming Laptops (5-10 juta)
+            { brand: 'Asus', model: 'TUF Gaming FX505DY', processor: 'AMD Ryzen 5 3550H', ram: '8GB', storage: '512GB SSD', price: 9500000, category: 'gaming' },
+            { brand: 'Acer', model: 'Nitro 5 AN515-43', processor: 'AMD Ryzen 5 3550H', ram: '8GB', storage: '512GB SSD', price: 9800000, category: 'gaming' },
+            { brand: 'Lenovo', model: 'IdeaPad Gaming 3', processor: 'AMD Ryzen 5 4600H', ram: '8GB', storage: '256GB SSD', price: 9900000, category: 'gaming' },
+            { brand: 'HP', model: 'Pavilion Gaming 15', processor: 'AMD Ryzen 5 3550H', ram: '8GB', storage: '512GB SSD', price: 9700000, category: 'gaming' },
+            { brand: 'Dell', model: 'G3 15', processor: 'Intel Core i5-10300H', ram: '8GB', storage: '256GB SSD', price: 9900000, category: 'gaming' },
+            { brand: 'MSI', model: 'GF63 Thin', processor: 'Intel Core i5-10300H', ram: '8GB', storage: '256GB SSD', price: 9800000, category: 'gaming' },
+            { brand: 'Asus', model: 'ROG Strix G G531GT', processor: 'Intel Core i5-9300H', ram: '8GB', storage: '512GB SSD', price: 9900000, category: 'gaming' },
+            { brand: 'Acer', model: 'Aspire 7', processor: 'AMD Ryzen 5 3550H', ram: '8GB', storage: '512GB SSD', price: 9600000, category: 'gaming' },
+            { brand: 'Lenovo', model: 'Legion 5', processor: 'AMD Ryzen 5 4600H', ram: '8GB', storage: '256GB SSD', price: 9900000, category: 'gaming' },
+            { brand: 'HP', model: 'OMEN 15', processor: 'AMD Ryzen 5 4600H', ram: '8GB', storage: '256GB SSD', price: 9900000, category: 'gaming' },
+            { brand: 'Dell', model: 'G5 15 SE', processor: 'AMD Ryzen 5 4600H', ram: '8GB', storage: '256GB SSD', price: 9800000, category: 'gaming' },
+            { brand: 'MSI', model: 'Bravo 15', processor: 'AMD Ryzen 5 4600H', ram: '8GB', storage: '512GB SSD', price: 9900000, category: 'gaming' },
+            { brand: 'Asus', model: 'TUF Gaming A15', processor: 'AMD Ryzen 5 4600H', ram: '8GB', storage: '512GB SSD', price: 9900000, category: 'gaming' },
+            { brand: 'Acer', model: 'Predator Helios 300', processor: 'Intel Core i5-10300H', ram: '8GB', storage: '256GB SSD', price: 9900000, category: 'gaming' },
+            { brand: 'Lenovo', model: 'IdeaPad L340 Gaming', processor: 'Intel Core i5-9300H', ram: '8GB', storage: '512GB SSD', price: 9500000, category: 'gaming' },
+            { brand: 'Asus', model: 'TUF Gaming FX505DT', processor: 'AMD Ryzen 5 3550H', ram: '8GB', storage: '512GB SSD', price: 9000000, category: 'gaming' },
+            { brand: 'Acer', model: 'Nitro 5', processor: 'Intel Core i5-10300H', ram: '8GB', storage: '512GB SSD', price: 12000000, category: 'gaming' },
+            { brand: 'Lenovo', model: 'Legion 5', processor: 'AMD Ryzen 5 4600H', ram: '16GB', storage: '512GB SSD', price: 14000000, category: 'gaming' },
+            { brand: 'Asus', model: 'ROG Strix G15', processor: 'AMD Ryzen 7 4800H', ram: '16GB', storage: '512GB SSD', price: 15000000, category: 'gaming' },
+            { brand: 'HP', model: 'OMEN 15', processor: 'Intel Core i7-10750H', ram: '16GB', storage: '512GB SSD', price: 16000000, category: 'gaming' },
+            { brand: 'MSI', model: 'GF65 Thin', processor: 'Intel Core i7-10750H', ram: '16GB', storage: '512GB SSD', price: 18000000, category: 'gaming' },
+            { brand: 'Asus', model: 'ROG Zephyrus G14', processor: 'AMD Ryzen 9 5900HS', ram: '32GB', storage: '1TB SSD', price: 25000000, category: 'gaming' },
+            { brand: 'Razer', model: 'Blade 15', processor: 'Intel Core i7-10875H', ram: '16GB', storage: '512GB SSD', price: 28000000, category: 'gaming' },
+            { brand: 'Dell', model: 'Alienware m17 R4', processor: 'Intel Core i9-10980HK', ram: '32GB', storage: '2TB SSD', price: 40000000, category: 'gaming' },
+            { brand: 'MSI', model: 'GE76 Raider', processor: 'Intel Core i9-10980HK', ram: '64GB', storage: '2TB SSD', price: 42000000, category: 'gaming' },
+            { brand: 'Gigabyte', model: 'AORUS 15G', processor: 'Intel Core i7-10870H', ram: '32GB', storage: '512GB SSD', price: 30000000, category: 'gaming' },
+            { brand: 'Acer', model: 'Predator Helios 300', processor: 'Intel Core i7-10750H', ram: '16GB', storage: '512GB SSD', price: 20000000, category: 'gaming' },
+            { brand: 'Lenovo', model: 'Legion 7', processor: 'AMD Ryzen 9 5900HX', ram: '32GB', storage: '1TB SSD', price: 35000000, category: 'gaming' },
+            { brand: 'HP', model: 'Pavilion Gaming 15', processor: 'AMD Ryzen 5 4600H', ram: '8GB', storage: '512GB SSD', price: 11000000, category: 'gaming' },
+            { brand: 'Asus', model: 'ROG Flow X13', processor: 'AMD Ryzen 9 5980HS', ram: '32GB', storage: '1TB SSD', price: 38000000, category: 'gaming' },
+
+            // Programming Laptops
+            { brand: 'Acer', model: 'Aspire 3', processor: 'AMD Ryzen 3 3250U', ram: '4GB', storage: '256GB SSD', price: 4800000, category: 'programming' },
+            { brand: 'Lenovo', model: 'IdeaPad Slim 3', processor: 'AMD Athlon Silver 3050U', ram: '4GB', storage: '256GB SSD', price: 4200000, category: 'programming' },
+            { brand: 'HP', model: '14s-fq0023au', processor: 'AMD Athlon Silver 3050U', ram: '4GB', storage: '256GB SSD', price: 4500000, category: 'programming' },
+            { brand: 'Asus', model: 'VivoBook 14 X415MA', processor: 'Intel Celeron N4020', ram: '4GB', storage: '256GB SSD', price: 3900000, category: 'programming' },
+            { brand: 'Dell', model: 'Vostro 3400', processor: 'Intel Pentium Gold 7505', ram: '4GB', storage: '256GB SSD', price: 4700000, category: 'programming' },
+            { brand: 'Lenovo', model: 'V14-ADA', processor: 'AMD Athlon Gold 3150U', ram: '4GB', storage: '256GB SSD', price: 4300000, category: 'programming' },
+            { brand: 'HP', model: '14s-cf2005TU', processor: 'Intel Celeron N4020', ram: '4GB', storage: '256GB SSD', price: 3800000, category: 'programming' },
+            { brand: 'Acer', model: 'Swift 1', processor: 'Intel Pentium Silver N5030', ram: '4GB', storage: '256GB SSD', price: 4900000, category: 'programming' },
+            { brand: 'Asus', model: 'E410MA', processor: 'Intel Celeron N4020', ram: '4GB', storage: '256GB eMMC', price: 3700000, category: 'programming' },
+            { brand: 'Dell', model: 'Inspiron 14 3480', processor: 'Intel Celeron 4205U', ram: '4GB', storage: '256GB SSD', price: 4600000, category: 'programming' },
+            { brand: 'Lenovo', model: 'ThinkPad E14', processor: 'AMD Ryzen 5 4500U', ram: '8GB', storage: '256GB SSD', price: 9500000, category: 'programming' },
+            { brand: 'Dell', model: 'Inspiron 15 3000', processor: 'Intel Core i5-1035G1', ram: '8GB', storage: '256GB SSD', price: 8500000, category: 'programming' },
+            { brand: 'HP', model: 'Pavilion 14', processor: 'AMD Ryzen 5 3500U', ram: '8GB', storage: '512GB SSD', price: 8000000, category: 'programming' },
+            { brand: 'Asus', model: 'VivoBook 15', processor: 'AMD Ryzen 5 3500U', ram: '8GB', storage: '512GB SSD', price: 7500000, category: 'programming' },
+            { brand: 'Acer', model: 'Aspire 5', processor: 'AMD Ryzen 5 3500U', ram: '8GB', storage: '256GB SSD', price: 7000000, category: 'programming' },
+            { brand: 'Lenovo', model: 'IdeaPad 3', processor: 'Intel Core i5-1035G1', ram: '8GB', storage: '256GB SSD', price: 6500000, category: 'programming' },
+            { brand: 'HP', model: 'ProBook 440 G7', processor: 'Intel Core i5-10210U', ram: '8GB', storage: '256GB SSD', price: 9000000, category: 'programming' },
+            { brand: 'Dell', model: 'Vostro 14 3400', processor: 'Intel Core i5-1135G7', ram: '8GB', storage: '256GB SSD', price: 8800000, category: 'programming' },
+            { brand: 'Asus', model: 'ExpertBook P2', processor: 'Intel Core i5-10210U', ram: '8GB', storage: '512GB SSD', price: 9200000, category: 'programming' },
+            { brand: 'MSI', model: 'Modern 14', processor: 'Intel Core i5-10210U', ram: '8GB', storage: '256GB SSD', price: 8700000, category: 'programming' },
+            { brand: 'Lenovo', model: 'ThinkPad E14', processor: 'AMD Ryzen 5 4500U', ram: '8GB', storage: '256GB SSD', price: 10000000, category: 'programming' },
+            { brand: 'Dell', model: 'Latitude 3410', processor: 'Intel Core i5-10210U', ram: '8GB', storage: '512GB SSD', price: 12000000, category: 'programming' },
+            { brand: 'HP', model: 'ProBook 445 G7', processor: 'AMD Ryzen 5 4500U', ram: '16GB', storage: '512GB SSD', price: 14000000, category: 'programming' },
+            { brand: 'Asus', model: 'ZenBook 14', processor: 'AMD Ryzen 7 4700U', ram: '16GB', storage: '512GB SSD', price: 16000000, category: 'programming' },
+            { brand: 'Apple', model: 'MacBook Air', processor: 'Apple M1', ram: '8GB', storage: '256GB SSD', price: 18000000, category: 'programming' },
+            { brand: 'Apple', model: 'MacBook Pro 13"', processor: 'Apple M1', ram: '16GB', storage: '512GB SSD', price: 22000000, category: 'programming' },
+            { brand: 'Lenovo', model: 'ThinkPad X1 Carbon', processor: 'Intel Core i7-1165G7', ram: '16GB', storage: '1TB SSD', price: 24000000, category: 'programming' },
+            { brand: 'Dell', model: 'XPS 13', processor: 'Intel Core i7-1185G7', ram: '32GB', storage: '1TB SSD', price: 28000000, category: 'programming' },
+            { brand: 'Apple', model: 'MacBook Pro 16"', processor: 'Apple M1 Pro', ram: '32GB', storage: '1TB SSD', price: 35000000, category: 'programming' },
+            { brand: 'Lenovo', model: 'ThinkPad P1', processor: 'Intel Xeon W-10855M', ram: '64GB', storage: '2TB SSD', price: 45000000, category: 'programming' },
+
+            // Design Laptops
+            { brand: 'Dell', model: 'XPS 15', processor: 'Intel Core i7-10750H', ram: '32GB', storage: '1TB SSD', price: 27000000, category: 'design' },
+            { brand: 'Apple', model: 'MacBook Pro 16"', processor: 'Intel Core i9', ram: '64GB', storage: '2TB SSD', price: 45000000, category: 'design' },
+            { brand: 'Asus', model: 'ProArt StudioBook Pro X', processor: 'Intel Xeon E-2276M', ram: '64GB', storage: '2TB SSD', price: 48000000, category: 'design' },
+            { brand: 'MSI', model: 'Creator 17', processor: 'Intel Core i7-10875H', ram: '32GB', storage: '1TB SSD', price: 35000000, category: 'design' },
+            { brand: 'Gigabyte', model: 'AERO 15 OLED', processor: 'Intel Core i7-10875H', ram: '16GB', storage: '512GB SSD', price: 30000000, category: 'design' },
+            { brand: 'Razer', model: 'Blade 15 Studio Edition', processor: 'Intel Core i7-10875H', ram: '32GB', storage: '1TB SSD', price: 40000000, category: 'design' },
+            { brand: 'HP', model: 'ZBook Create G7', processor: 'Intel Core i9-10885H', ram: '32GB', storage: '1TB SSD', price: 38000000, category: 'design' },
+            { brand: 'Lenovo', model: 'ThinkPad P15', processor: 'Intel Xeon W-10855M', ram: '64GB', storage: '1TB SSD', price: 42000000, category: 'design' },
+            { brand: 'Dell', model: 'Precision 7750', processor: 'Intel Xeon W-10885M', ram: '64GB', storage: '2TB SSD', price: 50000000, category: 'design' },
+            { brand: 'Acer', model: 'ConceptD 7 Ezel', processor: 'Intel Core i7-10875H', ram: '32GB', storage: '2TB SSD', price: 45000000, category: 'design' },
+
+            // Multimedia Laptops
+            { brand: 'Razer', model: 'Blade Pro 17', processor: 'Intel Core i9-10900H', ram: '32GB', storage: '1TB SSD', price: 38000000, category: 'multimedia' },
+            { brand: 'HP', model: 'Spectre x360 15', processor: 'Intel Core i7-10750H', ram: '16GB', storage: '1TB SSD', price: 25000000, category: 'multimedia' },
+            { brand: 'Lenovo', model: 'Yoga C940', processor: 'Intel Core i7-1065G7', ram: '16GB', storage: '512GB SSD', price: 20000000, category: 'multimedia' },
+            { brand: 'Asus', model: 'ZenBook Pro Duo', processor: 'Intel Core i9-10980HK', ram: '32GB', storage: '1TB SSD', price: 40000000, category: 'multimedia' },
+            { brand: 'Dell', model: 'XPS 17', processor: 'Intel Core i7-10875H', ram: '32GB', storage: '1TB SSD', price: 35000000, category: 'multimedia' },
+            { brand: 'LG', model: 'Gram 17', processor: 'Intel Core i7-1165G7', ram: '16GB', storage: '1TB SSD', price: 22000000, category: 'multimedia' },
+            { brand: 'Microsoft', model: 'Surface Laptop 4', processor: 'AMD Ryzen 7 4980U', ram: '16GB', storage: '512GB SSD', price: 24000000, category: 'multimedia' },
+            { brand: 'Acer', model: 'Swift 5', processor: 'Intel Core i7-1165G7', ram: '16GB', storage: '1TB SSD', price: 18000000, category: 'multimedia' },
+            { brand: 'Samsung', model: 'Galaxy Book Flex', processor: 'Intel Core i7-1065G7', ram: '16GB', storage: '512GB SSD', price: 21000000, category: 'multimedia' },
+            { brand: 'Huawei', model: 'MateBook X Pro', processor: 'Intel Core i7-10510U', ram: '16GB', storage: '1TB SSD', price: 23000000, category: 'multimedia' }
+        ];
+
+        function getLaptopRecommendations(budget, kebutuhan) {
+            return laptopDatabase.filter(laptop => 
+                laptop.price <= budget && 
+                laptop.category === kebutuhan
+            ).sort((a, b) => b.price - a.price);
+        }
+
+        function displayLaptops(laptops) {
+            const laptopList = document.getElementById('laptopRecommendations');
+            laptopList.innerHTML = '';
+            laptopList.style.display = 'block';
+
+            if (laptops.length === 0) {
+                laptopList.innerHTML = '<p>Maaf, tidak ada rekomendasi laptop yang sesuai dengan kriteria Anda.</p>';
+                return;
+            }
+
+            laptops.forEach(laptop => {
+                const laptopItem = document.createElement('div');
+                laptopItem.className = 'laptop-item';
+                laptopItem.innerHTML = `
+                    <h3>${laptop.brand} ${laptop.model}</h3>
+                    <p>Processor: ${laptop.processor}</p>
+                    <p>RAM: ${laptop.ram}</p>
+                    <p>Storage: ${laptop.storage}</p>
+                    <p>Harga: Rp ${laptop.price.toLocaleString('id-ID')}</p>
+                `;
+                laptopList.appendChild(laptopItem);
+            });
+        }
+
+        document.getElementById('laptopForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const budget = parseInt(document.getElementById('budget').value.replace(/\./g, ''));
+            const kebutuhan = document.getElementById('kebutuhan').value;
+            
+            const recommendedLaptops = getLaptopRecommendations(budget, kebutuhan);
+            displayLaptops(recommendedLaptops);
+        });
+    </script>
+</body>
+</html>
